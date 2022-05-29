@@ -79,8 +79,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void setInterval(){
 
         String intervalStr = (intervalBox.getText().toString());
-        if(intervalStr.equals("") || intervalStr.equals("0")){
-            Snackbar error = Snackbar.make(findViewById(R.id.mainLayout), "Input number can not be empty and can not be 0!", Snackbar.LENGTH_LONG);
+        if(intervalStr.equals("") || Integer.parseInt(intervalStr) < 1 ||  Integer.parseInt(intervalStr) > 10000){
+            Snackbar error = Snackbar.make(findViewById(R.id.mainLayout), "Input number can not be empty and has to be in range from 1 to 10000!", 5000);
             View errorView = error.getView();
             errorView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.dark_red));
             error.show();
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         else{
             App_data.setInterval(Integer.parseInt(intervalStr));
-            Snackbar ok = Snackbar.make(findViewById(R.id.mainLayout), "Interval of notification set successfully.", Snackbar.LENGTH_SHORT);
+            Snackbar ok = Snackbar.make(findViewById(R.id.mainLayout), "Interval of notification set successfully.", 5000);
             View okView = ok.getView();
             okView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.green));
             ok.show();
