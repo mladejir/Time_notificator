@@ -4,45 +4,43 @@ package com.example.time_notificator;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.util.Log;
-import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+/**
+ * @author Jiri Mladek
+ * Class representing background service of notification
+ */
 public class NotifierBackground extends Service {
 
     private NotificationManagerCompat notifManagerCompat;
     private Notification notification;
     private static boolean exit;
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         exit = false;
-        //create action for clicking the notification
 
         //For Android 8.0+
         createNotificationChannel();
 
-        //Notification
+        //Create notification and set attributes
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "1")
                 .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
                 .setContentTitle("Timer notification")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                //for clicking on notification
                 .setAutoCancel(true);
 
         notifManagerCompat = NotificationManagerCompat.from(this);
 
+        //Creating new thread for running app in the background
         Thread t1 = new Thread(
                 new Runnable() {
                     @Override
@@ -60,9 +58,8 @@ public class NotifierBackground extends Service {
                                         MainActivity.showNextTime();
                                     }
                                 });
-                                Thread.sleep(App_data.getIntervalMilisec()); //delay
+                                Thread.sleep(App_data.getIntervalMilisec()); //delay specified by user
                             } catch (InterruptedException e) {
-                                Log.e("hey", "Cathichn");
                                 e.printStackTrace();
                             }
                         }
@@ -71,31 +68,11 @@ public class NotifierBackground extends Service {
         );
         t1.setName("T1");
         t1.start();
-
         return super.onStartCommand(intent, flags, startId);
-
-
     }
-
-
-
-
-
-
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    public static void setExit(boolean exit) {
-        NotifierBackground.exit = exit;
-    }
-
 
     /**
-     * Method which creates notificationChannel (API 26+, Android 8.0+)
+     * Method which creates notificationChannel for notification(API 26+, Android 8.0+)
      */
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -104,4 +81,20 @@ public class NotifierBackground extends Service {
             notifManager.createNotificationChannel(notifChannel);
         }
     }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    /**
+     * Method which sets exit boolean value (true indicates that notification thread should stop)
+     * @param exit
+     */
+    public static void setExit(boolean exit) {
+        NotifierBackground.exit = exit;
+    }
+
+
 }
